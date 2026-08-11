@@ -7,6 +7,7 @@ import { validateEnvironment } from './config/environment.validation';
 import { HealthController } from './health.controller';
 import { OrdersModule } from './orders/orders.module';
 import { MapModule } from './map/map.module';
+import { DuelsModule } from './duels/duels.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
@@ -24,6 +25,7 @@ import { UsersModule } from './users/users.module';
         CardsModule,
         OrdersModule,
         MapModule,
+        DuelsModule,
         PaymentsModule,
         TypeOrmModule.forRootAsync({
             inject: [ConfigService],
