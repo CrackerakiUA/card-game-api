@@ -2,6 +2,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import type { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 
@@ -29,6 +30,19 @@ async function bootstrap() {
     );
 
     if (configService.getOrThrow<boolean>('SWAGGER_ENABLED')) {
+        const disableSwaggerCaching = (
+            _request: Request,
+            response: Response,
+            next: NextFunction,
+        ) => {
+            response.setHeader(
+                'Cache-Control',
+                'no-store, no-cache, must-revalidate, proxy-revalidate',
+            );
+            next();
+        };
+        app.use(`/${apiPrefix}/docs`, disableSwaggerCaching);
+        app.use(`/${apiPrefix}/docs-json`, disableSwaggerCaching);
         const swaggerConfig = new DocumentBuilder()
             .setTitle('Card Game API')
             .setDescription('REST API documentation')
