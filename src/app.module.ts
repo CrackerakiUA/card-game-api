@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CartModule } from './cart/cart.module';
 import { validateEnvironment } from './config/environment.validation';
 import { HealthController } from './health.controller';
 import { ProductsModule } from './products/products.module';
@@ -15,6 +16,7 @@ import { UsersModule } from './users/users.module';
         }),
         UsersModule,
         ProductsModule,
+        CartModule,
         TypeOrmModule.forRootAsync({
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => {

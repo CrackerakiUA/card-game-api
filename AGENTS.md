@@ -60,6 +60,7 @@ Do not commit `.env`, database credentials, generated build output, or `node_mod
 - Register entities with `TypeOrmModule.forFeature` in their owning module.
 - The `users` table is provisioned lazily from a verified Supabase `sub` and `email` on first `/api/me` request. A nickname and public slug are optional at provision time and are claimed together through `PATCH /api/me`; do not trust client-supplied authentication IDs.
 - Products use integer `priceAmount` values in the smallest currency unit. Public catalog routes expose only `published` products; catalog deletion sets the status to `archived`, and catalog management requires an `admin` or `store_manager` user role.
+- Cart item pricing is a snapshot of the published product price and currency at add-to-cart time. An authenticated user has at most one active cart; clearing it deletes only line items, while conversion and abandonment are reserved for the Order workflow.
 - Preserve the health endpoint at `GET /api/health` and avoid adding authentication to it unless deployment infrastructure is updated accordingly.
 - Document every public endpoint with `@nestjs/swagger` decorators. The interactive documentation is available at `/api/docs` when enabled; keep README route information limited to operational endpoints and documentation access.
 
