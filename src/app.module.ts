@@ -9,6 +9,7 @@ import { OrdersModule } from './orders/orders.module';
 import { MapModule } from './map/map.module';
 import { DuelsModule } from './duels/duels.module';
 import { SupportModule } from './support/support.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
@@ -28,6 +29,7 @@ import { UsersModule } from './users/users.module';
         MapModule,
         DuelsModule,
         SupportModule,
+        NotificationsModule,
         PaymentsModule,
         TypeOrmModule.forRootAsync({
             inject: [ConfigService],
