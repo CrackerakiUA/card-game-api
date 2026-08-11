@@ -17,7 +17,11 @@ export class CreateArticleDto {
     slug: string;
     @IsString() @Length(1, 500) excerpt: string;
     @IsString() content: string;
-    @IsOptional() @IsUrl({ require_tld: false }) coverImage?: string;
+    @IsOptional()
+    // class-validator uses this snake_case option name.
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    @IsUrl({ require_tld: false })
+    coverImage?: string;
     @IsOptional() @IsEnum(ArticleStatus) status?: ArticleStatus;
     @IsOptional() @IsBoolean() isFeatured?: boolean;
 }
