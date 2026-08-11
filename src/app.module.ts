@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { validateEnvironment } from './config/environment.validation';
 import { HealthController } from './health.controller';
+import { UsersModule } from './users/users.module';
 
 @Module({
     imports: [
@@ -11,6 +12,7 @@ import { HealthController } from './health.controller';
             cache: true,
             validate: validateEnvironment,
         }),
+        UsersModule,
         TypeOrmModule.forRootAsync({
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => {

@@ -75,5 +75,8 @@ export function validateEnvironment(
             'DATABASE_SSL_REJECT_UNAUTHORIZED',
             true,
         ),
+        SUPABASE_URL: environment.SUPABASE_URL,
+        SUPABASE_JWT_AUDIENCE:
+            environment.SUPABASE_JWT_AUDIENCE ?? 'authenticated',
     };
 }

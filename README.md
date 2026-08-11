@@ -1,134 +1,182 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Card Game API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS API backed by PostgreSQL. Docker is used for the local PostgreSQL database; the API runs locally with Node.js.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Prerequisites
 
-## Description
+- [Node.js (LTS)](https://nodejs.org/en/download) — includes npm.
+- [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/) — install it, start Docker Desktop, and complete its first-run setup before continuing.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Confirm both are available in a new PowerShell window:
 
-## Project setup
-
-```bash
-$ npm install
+```powershell
+node --version
+npm --version
+docker --version
+docker compose version
 ```
 
-Create local configuration and start PostgreSQL:
+## Start the project (Windows)
 
-```bash
-$ cp .env.example .env
-$ docker compose up -d
+Open PowerShell in the project folder and run:
+
+```powershell
+# 1. Install API dependencies (only needed after cloning or dependency changes)
+npm.cmd install
+
+# 2. Create your local environment file (only needed once)
+Copy-Item .env.example .env
+
+# 3. Start PostgreSQL in Docker
+docker compose up -d
+
+# 4. Start the API in watch mode
+npm.cmd run start:dev
 ```
 
-## Compile and run the project
+The API is ready when the terminal reports that Nest has started. Check it at:
 
-```bash
-# development
-$ npm run start
+- Health check: <http://localhost:3000/api/health>
+- OpenAPI/Swagger docs: <http://localhost:3000/api/docs>
 
-# watch mode
-$ npm run start:dev
+Keep the `npm.cmd run start:dev` terminal open while developing. The API reloads when source files change.
 
-# production mode
-$ npm run start:prod
+## Useful Docker commands
+
+```powershell
+# See whether PostgreSQL is running and healthy
+docker compose ps
+
+# View PostgreSQL logs
+docker compose logs -f postgres
+
+# Stop PostgreSQL without deleting its data
+docker compose down
 ```
 
-## Run tests
+The database is stored in Docker's `postgres_data` volume and remains after `docker compose down`. Do not use `docker compose down -v` unless you deliberately want to permanently erase local database data.
 
-```bash
-# unit tests
-$ npm run test
+## Tests and build
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```powershell
+npm.cmd run build
+npm.cmd test -- --runInBand
 ```
 
 ## Database migrations
 
-Schema synchronization is disabled in every environment. Create and review a TypeORM migration when entities change, then apply compiled migrations with:
+Schema synchronization is disabled. Create and review a TypeORM migration whenever entities change, then apply compiled migrations with:
 
-```bash
-$ npm run migration:run
+```powershell
+npm.cmd run migration:run
 ```
 
-Run migrations as a separate deployment step before starting the production API. Never enable `synchronize` or commit production secrets.
+## Deploy on Ubuntu with PM2
 
-## Operations
+This project uses Docker only for PostgreSQL. On the Ubuntu server, install Node.js, Docker Engine with the Compose plugin, and PM2. Use a supported Ubuntu LTS release and a non-root deployment user.
 
-- `GET /api/health` verifies API and PostgreSQL availability.
-- Interactive OpenAPI documentation is available at `http://localhost:3000/api/docs` in development.
-- Set `SWAGGER_ENABLED=false` in production unless the documentation endpoint is deliberately protected and exposed.
-- Set `CORS_ORIGINS` to the exact comma-separated browser client origins used by the deployment.
-- Production enables PostgreSQL TLS by default. Supply your provider's CA-backed certificate settings and keep `DATABASE_SSL_REJECT_UNAUTHORIZED=true`.
+### 1. Install server software
 
-## PM2
-
-Install PM2 globally, then start or update the compiled production API with:
+For Ubuntu 22.04 on AMD64, install Node.js 22 LTS and Docker Engine with its Compose plugin as root:
 
 ```bash
-$ npm install -g pm2
-$ npm run pm2:add
+apt-get update
+apt-get install -y ca-certificates curl gnupg git build-essential
+
+# Node.js 22 LTS
+curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+apt-get install -y nodejs
+
+# Docker Engine and Docker Compose plugin
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu jammy stable" > /etc/apt/sources.list.d/docker.list
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+systemctl enable --now docker
 ```
 
-View logs with `pm2 logs card-game-api`. Remove the process with `npm run pm2:remove`.
+These Docker commands follow Docker's official [Ubuntu installation instructions](https://docs.docker.com/engine/install/ubuntu/). Do not use Docker's convenience installation script on a production server.
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Install PM2 after Node.js is available:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+sudo npm install --global pm2
+node --version
+npm --version
+docker --version
+docker compose version
+pm2 --version
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+To let the deployment user run Docker without `sudo`, follow Docker's [post-install steps](https://docs.docker.com/engine/install/linux-postinstall/). This grants that user root-equivalent access to Docker, so only do it for a trusted deployment user.
 
-## Resources
+### 2. Configure and start the application
 
-Check out a few resources that may come in handy when working with NestJS:
+Clone or upload the repository, then run these commands from its root directory:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+# Install the exact dependency versions in package-lock.json
+npm ci
 
-## Support
+# Create the server-only configuration file
+cp .env.example .env
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+# Edit .env before continuing: set NODE_ENV=production, CORS_ORIGINS,
+# database credentials, and production database/TLS settings.
+nano .env
 
-## Stay in touch
+# Start the PostgreSQL container
+docker compose up -d
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# Build, then apply reviewed migrations before the API starts
+npm run migration:run
 
-## License
+# Build and start (or reload) the API through PM2
+npm run pm2:add
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Confirm the process and database are running:
+
+```bash
+pm2 status
+pm2 logs card-game-api
+docker compose ps
+curl http://127.0.0.1:3000/api/health
+```
+
+### 3. Start PM2 automatically after a reboot
+
+Run this as the same non-root user that owns the checkout and runs PM2:
+
+```bash
+pm2 startup
+```
+
+PM2 prints one `sudo` command. Copy and run that exact command, then save the current process list:
+
+```bash
+pm2 save
+```
+
+After a deployment, run:
+
+```bash
+git pull
+npm ci
+npm run migration:run
+npm run pm2:add
+pm2 save
+```
+
+`npm run pm2:add` builds the API and uses `ecosystem.config.cjs` to start or reload the process named `card-game-api`. To stop it intentionally, use `npm run pm2:remove`.
+
+## Production notes
+
+- Run migrations as a separate step before starting the API.
+- Provide secrets through the deployment platform; do not commit `.env`.
+- Swagger is enabled outside production by default. Set `SWAGGER_ENABLED=false` in production unless the endpoint is intentionally protected.
+- Set `CORS_ORIGINS` to the exact browser origins used by the deployment.
+- PostgreSQL is bound to `127.0.0.1:5432`, so it is available to the API on the server but is not publicly reachable.
+- Put the API behind a TLS-enabled reverse proxy (such as Nginx or Caddy) before exposing it publicly.
