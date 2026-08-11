@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CartModule } from './cart/cart.module';
+import { CardsModule } from './cards/cards.module';
 import { validateEnvironment } from './config/environment.validation';
 import { HealthController } from './health.controller';
 import { OrdersModule } from './orders/orders.module';
@@ -19,6 +20,7 @@ import { UsersModule } from './users/users.module';
         UsersModule,
         ProductsModule,
         CartModule,
+        CardsModule,
         OrdersModule,
         PaymentsModule,
         TypeOrmModule.forRootAsync({
