@@ -5,6 +5,7 @@ import { CartModule } from './cart/cart.module';
 import { validateEnvironment } from './config/environment.validation';
 import { HealthController } from './health.controller';
 import { OrdersModule } from './orders/orders.module';
+import { PaymentsModule } from './payments/payments.module';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
 
@@ -19,6 +20,7 @@ import { UsersModule } from './users/users.module';
         ProductsModule,
         CartModule,
         OrdersModule,
+        PaymentsModule,
         TypeOrmModule.forRootAsync({
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => {

@@ -78,5 +78,9 @@ export function validateEnvironment(
         SUPABASE_URL: environment.SUPABASE_URL,
         SUPABASE_JWT_AUDIENCE:
             environment.SUPABASE_JWT_AUDIENCE ?? 'authenticated',
+        STRIPE_SECRET_KEY: environment.STRIPE_SECRET_KEY,
+        STRIPE_WEBHOOK_SECRET: environment.STRIPE_WEBHOOK_SECRET,
+        STRIPE_CHECKOUT_SUCCESS_URL: environment.STRIPE_CHECKOUT_SUCCESS_URL,
+        STRIPE_CHECKOUT_CANCEL_URL: environment.STRIPE_CHECKOUT_CANCEL_URL,
     };
 }
