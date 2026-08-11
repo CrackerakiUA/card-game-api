@@ -14,8 +14,10 @@ import {
 } from '@nestjs/common';
 import {
     ApiBearerAuth,
+    ApiNoContentResponse,
     ApiOkResponse,
     ApiOperation,
+    ApiParam,
     ApiTags,
 } from '@nestjs/swagger';
 import type { AuthenticatedRequest } from './supabase-auth.guard';
@@ -24,6 +26,12 @@ import { ListUsersQueryDto } from './dto/list-users-query.dto';
 import { UpdateMyProfileDto } from './dto/update-my-profile.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
+import {
+    AdminUserListResponseDto,
+    CurrentUserResponseDto,
+    PublicUserListResponseDto,
+    PublicUserResponseDto,
+} from './dto/user-response.dto';
 import { User, UserRole, UserStatus } from './user.entity';
 import { UsersService } from './users.service';
 
@@ -34,6 +42,7 @@ export class UsersController {
 
     @Get('users')
     @ApiOperation({ summary: 'List public player profiles' })
+    @ApiOkResponse({ type: PublicUserListResponseDto })
     async listUsers(@Query() query: ListUsersQueryDto) {
         const result = await this.usersService.listPublic(query);
         return {
@@ -44,6 +53,8 @@ export class UsersController {
 
     @Get('users/:slug')
     @ApiOperation({ summary: 'Get a public player profile' })
+    @ApiParam({ name: 'slug', example: 'card-master' })
+    @ApiOkResponse({ type: PublicUserResponseDto })
     async getUser(@Param('slug') slug: string) {
         return this.publicUser(await this.usersService.findPublicBySlug(slug));
     }
@@ -52,7 +63,10 @@ export class UsersController {
     @UseGuards(SupabaseAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Get or provision the current user profile' })
-    @ApiOkResponse({ description: 'Current user profile' })
+    @ApiOkResponse({
+        description: 'Current user profile',
+        type: CurrentUserResponseDto,
+    })
     async getMe(@Req() request: AuthenticatedRequest) {
         const auth = request.authUser!;
         return this.privateUser(
@@ -64,6 +78,7 @@ export class UsersController {
     @UseGuards(SupabaseAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Update the current user profile' })
+    @ApiOkResponse({ type: CurrentUserResponseDto })
     async updateMe(
         @Req() request: AuthenticatedRequest,
         @Body() dto: UpdateMyProfileDto,
@@ -83,6 +98,7 @@ export class UsersController {
     @UseGuards(SupabaseAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Deactivate the current application profile' })
+    @ApiNoContentResponse({ description: 'Profile deactivated' })
     async deleteMe(@Req() request: AuthenticatedRequest): Promise<void> {
         const auth = request.authUser!;
         const user = await this.usersService.findOrCreate(
@@ -96,6 +112,7 @@ export class UsersController {
     @UseGuards(SupabaseAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'List all users (admin)' })
+    @ApiOkResponse({ type: AdminUserListResponseDto })
     async listAdminUsers(
         @Req() request: AuthenticatedRequest,
         @Query() query: ListUsersQueryDto,
@@ -108,6 +125,8 @@ export class UsersController {
     @UseGuards(SupabaseAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Get a user (admin)' })
+    @ApiParam({ name: 'id', format: 'uuid' })
+    @ApiOkResponse({ type: CurrentUserResponseDto })
     async getAdminUser(
         @Req() request: AuthenticatedRequest,
         @Param('id', new ParseUUIDPipe()) id: string,
@@ -120,6 +139,8 @@ export class UsersController {
     @UseGuards(SupabaseAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Change a user role (admin)' })
+    @ApiParam({ name: 'id', format: 'uuid' })
+    @ApiOkResponse({ type: CurrentUserResponseDto })
     async updateRole(
         @Req() request: AuthenticatedRequest,
         @Param('id', new ParseUUIDPipe()) id: string,
@@ -133,6 +154,8 @@ export class UsersController {
     @UseGuards(SupabaseAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Change a user status (admin)' })
+    @ApiParam({ name: 'id', format: 'uuid' })
+    @ApiOkResponse({ type: CurrentUserResponseDto })
     async updateStatus(
         @Req() request: AuthenticatedRequest,
         @Param('id', new ParseUUIDPipe()) id: string,
