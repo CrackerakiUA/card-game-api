@@ -8,6 +8,7 @@ import { HealthController } from './health.controller';
 import { OrdersModule } from './orders/orders.module';
 import { MapModule } from './map/map.module';
 import { DuelsModule } from './duels/duels.module';
+import { SupportModule } from './support/support.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
@@ -26,6 +27,7 @@ import { UsersModule } from './users/users.module';
         OrdersModule,
         MapModule,
         DuelsModule,
+        SupportModule,
         PaymentsModule,
         TypeOrmModule.forRootAsync({
             inject: [ConfigService],
