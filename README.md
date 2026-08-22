@@ -41,6 +41,25 @@ The API is ready when the terminal reports that Nest has started. Check it at:
 
 Keep the `npm.cmd run start:dev` terminal open while developing. The API reloads when source files change.
 
+## Supabase authentication
+
+Authenticated API routes use Supabase access tokens. In the Supabase dashboard, copy the **Project URL** (available from **Connect** or **Project Settings → API**) into the local `.env` file:
+
+```env
+# Replace with your own Supabase Project URL.
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_JWT_AUDIENCE=authenticated
+
+# The exact URL where the browser app runs locally.
+CORS_ORIGINS=http://localhost:4200
+```
+
+The frontend signs users in through this same Supabase project and sends the resulting access token to protected API routes as `Authorization: Bearer <access_token>`. The API uses its matching `SUPABASE_URL` to verify that token; it does not perform the browser sign-in itself.
+
+For email sign-in, set Supabase **Authentication → URL Configuration** to the frontend URL and add that URL (for example, `http://localhost:4200/**`) to **Redirect URLs**. The API verifies Supabase JWTs using the project's public signing keys, so keep an asymmetric current signing key (such as ECC P-256 / ES256) enabled in **Project Settings → JWT Keys**.
+
+Do not commit `.env`. The frontend uses the Supabase Project URL and its publishable key; never expose a Supabase `secret`/`service_role` key in the frontend or add it to this API merely for user-token verification.
+
 ## Useful Docker commands
 
 ```powershell
